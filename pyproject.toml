@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "mkdocs-git-utils"
+version = "0.1.0"
+description = ""
+authors = ["Zeglius <33781398+Zeglius@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+mkdocs = "^1.6.1"
+pygit2 = "^1.15.1"
+requests = "^2.32.3"
+
+
+[tool.poetry.group.dev.dependencies]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.plugins."mkdocs.plugins"]
+git_utils = "mkdocs_git_utils.plugin:GitUtilsPlugin"
