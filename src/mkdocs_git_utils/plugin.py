@@ -1,5 +1,6 @@
 import re
 from pathlib import Path
+from typing import Literal
 
 from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.plugins import BasePlugin
@@ -9,7 +10,7 @@ from mkdocs.utils.templates import TemplateContext
 from pygit2 import Repository
 from pygit2.enums import SortMode
 
-from mkdocs_git_utils.types import author_from_name, author_from_signature
+from mkdocs_git_utils.types import AuthorDict, author_from_name, author_from_signature
 
 from .config import PluginConfig
 
@@ -52,10 +53,15 @@ class GitUtilsPlugin(BasePlugin[PluginConfig]):
                 )
             )
             # Fetch coauthors
-            if m := re.search(self.CO_AUTHOR_RE, c.message, flags=re.M):
+            for m in re.finditer(self.CO_AUTHOR_RE, c.message, flags=re.M):
                 name, email = m.group("name", "email")
                 authors.append(author_from_name(name=name, email=email))
                 del name, email
-        # Adapt authors
+        # Delete bot commits
+        for i, a in enumerate(authors):
+            if not isinstance(a, AuthorDict):
+                continue
+            if "[bot]" in a.name + " " + a.email:
+                del authors[i]
         context["committers"] = authors  # type: ignore
         return context
