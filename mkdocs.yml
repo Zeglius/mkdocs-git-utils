@@ -5,7 +5,7 @@ theme:
   name: material
 
 plugins:
-  - git_utils
+  - git-committers
   - privacy
 
 markdown_extensions:
