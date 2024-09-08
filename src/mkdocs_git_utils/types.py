@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from pygit2 import Commit, Signature
+from git import Commit
 
 
 class DummyAuthor:
@@ -46,6 +46,6 @@ def author_from_name(*, name: str, email: str = "", **kargs):
     )
 
 
-def author_from_signature(sign: Signature):
+def author_from_signature(sign):
     name, email = sign.name, sign.email
     return author_from_name(name=name, email=email)
