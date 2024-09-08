@@ -9,18 +9,15 @@ from mkdocs.utils.templates import TemplateContext
 from pygit2 import Repository
 from pygit2.enums import SortMode
 
-from mkdocs_git_utils.types import _SignatureWrapper
+from mkdocs_git_utils.types import author_from_name, author_from_signature
 
 from .config import PluginConfig
 
 
 class GitUtilsPlugin(BasePlugin[PluginConfig]):
-    CO_AUTHOR_RE = re.compile(r"^Co-authored-by:\s(?P<name>[^<]*)\s<(?P<email>[^>]*)")
+    CO_AUTHOR_RE = r"^Co-authored-by:\s(?P<name>[^<]*)\s<(?P<email>[^>]*)"
 
     def on_config(self, config: MkDocsConfig):
-        if not config["enabled"]:
-            return
-
         self.repo = Repository(".")
         self.head = self.repo.head
         self.cache_dir = (
@@ -36,17 +33,29 @@ class GitUtilsPlugin(BasePlugin[PluginConfig]):
         config: MkDocsConfig,
         nav: Navigation,
     ) -> TemplateContext | None:
-        if not config["enabled"]:
+        if not self.config.enabled:
             return super().on_page_context(context, page=page, config=config, nav=nav)
 
-        context["commiters"]  # type: ignore
+        context["committers"] = []  # type: ignore
+        if not self.config.enabled:
+            return context
+
         # Fetch all possible authors
-        authors: set[_SignatureWrapper] = set()
-        for c in self.repo.walk(self.head.target, sort_mode=SortMode.TIME):
-            authors.add(_SignatureWrapper(c.author))
-            authors.add(_SignatureWrapper(c.committer))
+        authors = []
+        for c in self.repo.walk(self.head.target, SortMode.TIME):
+            authors = list(
+                set(
+                    [
+                        *authors,
+                        *[author_from_signature(x) for x in [c.author, c.committer]],
+                    ]
+                )
+            )
             # Fetch coauthors
-            if m := self.CO_AUTHOR_RE.search(c.message):
+            if m := re.search(self.CO_AUTHOR_RE, c.message, flags=re.M):
                 name, email = m.group("name", "email")
-                authors.add(_SignatureWrapper(name=name))
-        context["commiters"] = list(authors)  # type: ignore
+                authors.append(author_from_name(name=name, email=email))
+                del name, email
+        # Adapt authors
+        context["committers"] = authors  # type: ignore
+        return context

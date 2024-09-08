@@ -1,42 +1,51 @@
-import requests
-from pygit2 import Signature
+from dataclasses import dataclass
+
+from pygit2 import Commit, Signature
 
 
-from functools import cached_property
+class DummyAuthor:
+    """Dummy class for author types"""
+
+    pass
 
 
-class _SignatureWrapper:
-    def __init__(
-        self, signature: Signature | None = None, /, name: str | None = None
-    ) -> None:
-        self.signature = signature
-        self._name = name or signature.name if signature else None
+@dataclass
+class Coauthor(DummyAuthor):
+    """Dummy dict for coauthors"""
+
+    name: str
+    email: str
+
+
+@dataclass
+class AuthorDict:
+    name: str
+    avatar: str
+    url: str
+    login: str
+    email: str
+    _commit: Commit | None = None
+
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, self.__class__):
+            return False
+        return self.name == value.name
 
     def __hash__(self) -> int:
-        return self.name.__hash__()
-
-    @property
-    def name(self):
-        return self._name
+        return hash(self.name)
 
 
-class GithubUser:
-    __session: requests.Session
+def author_from_name(*, name: str, email: str = "", **kargs):
+    return AuthorDict(
+        name=name,
+        avatar=f"https://github.com/{name}.png",
+        url=f"https://github.com/{name}/",
+        login=name,
+        email=email,
+        _commit=kargs.get("commit", None),
+    )
 
-    def __init__(
-        self, username: str, email: str | None, /, *, signature: Signature | None = None
-    ) -> None:
-        self.username = username
-        self._avatar_url = f"https://github.com/{username}.png"
-        self.email = email
-        self._signature = signature
 
-    @property
-    def session(self):
-        if not self.__session:
-            self.__session = requests.Session()
-        return self.__session
-
-    @cached_property
-    def avatar_url(self):
-        return self.session.head(self._avatar_url).url
+def author_from_signature(sign: Signature):
+    name, email = sign.name, sign.email
+    return author_from_name(name=name, email=email)

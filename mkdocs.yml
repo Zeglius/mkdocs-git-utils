@@ -1,0 +1,14 @@
+site_name: mkdocs-git-utils
+site_author: Zeglius
+
+theme:
+  name: material
+
+plugins:
+  - git_utils
+  - privacy
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences

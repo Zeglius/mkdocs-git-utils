@@ -13,10 +13,12 @@ requests = "^2.32.3"
 
 
 [tool.poetry.group.dev.dependencies]
+mkdocs-material = "^9.5.34"
+
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.plugins."mkdocs.plugins"]
-git_utils = "mkdocs_git_utils.plugin:GitUtilsPlugin"
+git-committers = "mkdocs_git_utils.plugin:GitUtilsPlugin"
