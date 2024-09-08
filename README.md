@@ -1,21 +1,13 @@
 # mkdocs-git-utils
 
-[![PyPI - Version](https://img.shields.io/pypi/v/mkdocs-git-utils.svg)](https://pypi.org/project/mkdocs-git-utils)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/mkdocs-git-utils.svg)](https://pypi.org/project/mkdocs-git-utils)
+An alternative\* to [mkdocs-git-committers-plugin²][git-commit-plugin2]
 
------
+<small>\* Is not a 1:1 alternative, functionality may differ.</small>
 
-## Table of Contents
+## Install
 
-- [Installation](#installation)
-- [License](#license)
-
-## Installation
-
-```console
-pip install mkdocs-git-utils
+```sh
+pip install git+https://github.com/Zeglius/mkdocs-git-utils
 ```
 
-## License
-
-`mkdocs-git-utils` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+[git-commit-plugin2]: https://github.com/ojacques/mkdocs-git-committers-plugin-2
